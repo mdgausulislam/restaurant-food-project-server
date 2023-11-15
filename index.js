@@ -39,11 +39,25 @@ async function run() {
 
 
         // users apis
+        app.get('/users',async(req,res)=>{
+            const result=await usersCollection.find().toArray();
+            res.send(result)
+        })
+
+
         app.post('/users', async (req, res) => {
             const user=req.body;
-            const result= await usersCollection.find().toArray();
+            console.log(user);
+            const query={email:user.email}
+            const existingUser = await usersCollection.findOne(query);
+            console.log(existingUser);
+            if(existingUser){
+                return res.send({message:'users already exists'})
+            }
+            const result= await usersCollection.insertOne(user);
             res.send(result);
         })
+
 
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray();
