@@ -85,24 +85,24 @@ async function run() {
         })
 
 
-        // app.patch('/users/admin/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const filter = { _id: new ObjectId(id) }
+         app.patch('/users/admin/:id', async (req, res) => {
+             const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
 
-        //     const updateDoc = {
-        //         $set: {
-        //             role: 'admin'
-        //         },
-        //     }
-        //     const result = await usersCollection.updateOne(filter, updateDoc);
-        //     res.send(result);
-        // })
+             const updateDoc = {
+                 $set: {
+                    role: 'admin'
+                 },
+            }
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
 
-        // app.post('/jwt', (req, res) => {
-        //     const user = req.body;
-        //     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
-        //     res.send({ token })
-        // })
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            res.send({ token })
+        })
 
 
 
