@@ -143,11 +143,19 @@ async function run() {
         })
 
         //menu related apis
-
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray();
             res.send(result)
         })
+
+        app.post('/menu',verifyToken,verifyAdmin,async(req,res)=>{
+            const newItem=req.body;
+            const result=await menuCollection.insertOne(newItem);
+            res.send(result);
+        })
+
+
+
 
 
         //review related apis
@@ -155,6 +163,8 @@ async function run() {
             const result = await reviewsCollection.find().toArray();
             res.send(result)
         })
+
+
 
         //Cart Collection api
 
