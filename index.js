@@ -3,6 +3,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
 
 const port = process.env.PORT || 5000;
 
@@ -65,7 +66,7 @@ async function run() {
 
         //users apis
 
-        app.get('/users', verifyToken,verifyAdmin, async (req, res) => {
+        app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         });
@@ -109,20 +110,6 @@ async function run() {
         })
 
 
-        // app.patch('/users/admin/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const filter = { _id: new ObjectId(id) }
-
-        //     const updateDoc = {
-        //         $set: {
-        //             role: 'admin'
-        //         },
-        //     }
-        //     const result = await usersCollection.updateOne(filter, updateDoc);
-        //     res.send(result);
-        // })
-
-
         app.patch('/users/admin/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
@@ -148,9 +135,16 @@ async function run() {
             res.send(result)
         })
 
-        app.post('/menu',verifyToken,verifyAdmin,async(req,res)=>{
-            const newItem=req.body;
-            const result=await menuCollection.insertOne(newItem);
+        app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
+            const newItem = req.body;
+            const result = await menuCollection.insertOne(newItem);
+            res.send(result);
+        })
+
+        app.delete('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await menuCollection.deleteOne(query);
             res.send(result);
         })
 
@@ -204,6 +198,19 @@ async function run() {
             res.send(result);
         })
 
+        //create payment intent
+        app.post('/create-payment-intent', async (res, req) => {
+            const {price} = req.body;
+            const amount=price*100;
+            const paymentIntent=await stripe.paymentIntents.create({
+                amount:amount,
+                currency:'usd',
+                payment_method_types:['card']
+            })
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        })
 
 
 
